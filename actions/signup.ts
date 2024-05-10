@@ -1,6 +1,6 @@
 "use server";
 import * as z from "zod";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { SignupSchema } from "../schemas/index";
 import { getUserByEmail } from "@/data/user";
@@ -14,7 +14,7 @@ export async function signup(formData: z.infer<typeof SignupSchema>) {
   const validatedFields = SignupSchema.safeParse(formData);
 
   if (!validatedFields.success) {
-    return { success: false, message: "Invalid fields" };
+    return { error: "Invalid fields" };
   }
 
   const { email, password, name } = validatedFields.data;
@@ -23,7 +23,7 @@ export async function signup(formData: z.infer<typeof SignupSchema>) {
   const existingUser = await getUserByEmail(email);
 
   if (existingUser) {
-    return { success: false, message: "Email already in use" };
+    return { sucess: "Email already in use" };
   }
 
   await db.user.create({
@@ -32,5 +32,5 @@ export async function signup(formData: z.infer<typeof SignupSchema>) {
 
   // TODO: Send verification token email
 
-  return { success: true, message: "User created successfully" };
+  return { success: "User created successfully" };
 }

@@ -34,8 +34,8 @@ function SignupForm() {
     setSuccessMsg("");
     startTransition(async () => {
       const data = await signup(values);
-      if (data.success) setSuccessMsg(data.message);
-      if (!data.success) setError(data.message);
+      if (data?.success) setSuccessMsg(data.success);
+      if (data?.error) setError(data.error);
     });
   }
   return (
