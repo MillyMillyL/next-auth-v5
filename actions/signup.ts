@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { SignupSchema } from "../schemas/index";
 import { getUserByEmail } from "@/data/user";
+import { generateVerificationToken } from "@/lib/tokens";
+import sendVerificationEmail from "@/lib/mail";
 
 // interface LoginResponse {
 //   success: boolean;
@@ -30,7 +32,13 @@ export async function signup(formData: z.infer<typeof SignupSchema>) {
     data: { name, email, password: hashedPassword },
   });
 
-  // TODO: Send verification token email
+  //generate verfificationToken
+  const verfificationToken = await generateVerificationToken(email);
 
-  return { success: "User created successfully" };
+  await sendVerificationEmail(
+    "liuhongmein@gmail.com",
+    verfificationToken.token
+  );
+
+  return { success: "Confirmation email sent!" };
 }

@@ -49,14 +49,19 @@ export const {
     },
   },
   callbacks: {
-    // async signIn({ user }) {
-    //   console.log(user, "--signIn user");
-    //   const existingUser = await getUserById(user.id as string);
-    //   if (!existingUser /*|| !existingUser.emailVerified */) {
-    //     return false;
-    //   }
-    //   return true;
-    // },
+    async signIn({ user, account }) {
+      console.log({ user, account }, "---signin user account");
+      //allow oauth without email verification
+      if (account?.provider !== "credentials") return true;
+
+      //prevent signIn without email verification
+      const existingUser = await getUserById(user.id as string);
+      if (!existingUser?.emailVerified) return false;
+
+      //TODO: add 2fa check
+
+      return true;
+    },
     async jwt({ token }) {
       if (!token.sub) return token;
 
@@ -67,8 +72,6 @@ export const {
       return token;
     },
     async session({ session, token }) {
-      console.log({ token }, "--session token");
-      console.log({ session }, "--session session");
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
