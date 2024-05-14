@@ -14,11 +14,18 @@ function NewVerificationForm() {
 
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+
   const onSubmit = useCallback(async () => {
+    if (successMsg || error) return;
+
+    // setError("");
+    // setSuccessMsg("");
+
     if (!token) {
       setError("Missing token");
       return;
     }
+
     try {
       const data = await newVerification(token);
       setError(data.error);
@@ -26,7 +33,7 @@ function NewVerificationForm() {
     } catch (error) {
       setError("Something went wrong!");
     }
-  }, [token]);
+  }, [token, successMsg, error]);
 
   useEffect(() => {
     onSubmit();
@@ -40,8 +47,9 @@ function NewVerificationForm() {
     >
       <div className="flex justify-center items-center w-full">
         {!error && !successMsg && <BeatLoader />}
-        {error && <FormError message={error} />}
-        {successMsg && <FormError message={successMsg} />}
+        {!successMsg && <FormError message={error} />}
+
+        <FormSuccess message={successMsg} />
       </div>
     </CardWrapper>
   );
