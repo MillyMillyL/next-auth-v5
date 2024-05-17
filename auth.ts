@@ -6,6 +6,9 @@ import authConfig from "./auth.config";
 
 import { JWT } from "next-auth/jwt";
 import { UserRole } from "@prisma/client";
+import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
+import { generateTwoFactorToken } from "./lib/tokens";
+import { sendTwoFactorTokenEmail } from "./lib/mail";
 
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
@@ -50,7 +53,6 @@ export const {
   },
   callbacks: {
     async signIn({ user, account }) {
-      console.log({ user, account }, "---signin user account");
       //allow oauth without email verification
       if (account?.provider !== "credentials") return true;
 
@@ -59,6 +61,20 @@ export const {
       if (!existingUser?.emailVerified) return false;
 
       //TODO: add 2fa check
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        );
+        console.log(twoFactorConfirmation, "--twofactorconfirmation");
+        if (!twoFactorConfirmation) return false;
+
+        //check if token expired
+
+        //delete two factor confirmation for next signin
+        await db.twoFactorConfirmation.delete({
+          where: { id: twoFactorConfirmation.id },
+        });
+      }
 
       return true;
     },
