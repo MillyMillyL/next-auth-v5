@@ -7,8 +7,6 @@ import authConfig from "./auth.config";
 import { JWT } from "next-auth/jwt";
 import { UserRole } from "@prisma/client";
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
-import { generateTwoFactorToken } from "./lib/tokens";
-import { sendTwoFactorTokenEmail } from "./lib/mail";
 
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
@@ -17,22 +15,26 @@ declare module "next-auth/jwt" {
     role?: UserRole;
   }
 }
+
+export type ExtendedUser = {
+  /** The user's postal address. */
+  // id: string;
+  role: UserRole;
+  isTwoFactorEnabled: boolean;
+  /**
+   * By default, TypeScript merges new interface properties and overwrites existing ones.
+   * In this case, the default session user properties will be overwritten,
+   * with the new ones defined above. To keep the default session user properties,
+   * you need to add them back into the newly declared interface.
+   */
+} & DefaultSession["user"];
+
 declare module "next-auth" {
   /**
    * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
    */
   interface Session {
-    user: {
-      /** The user's postal address. */
-      id: string;
-      role: UserRole;
-      /**
-       * By default, TypeScript merges new interface properties and overwrites existing ones.
-       * In this case, the default session user properties will be overwritten,
-       * with the new ones defined above. To keep the default session user properties,
-       * you need to add them back into the newly declared interface.
-       */
-    } & DefaultSession["user"];
+    user: ExtendedUser;
   }
 }
 
@@ -60,7 +62,7 @@ export const {
       const existingUser = await getUserById(user.id as string);
       if (!existingUser?.emailVerified) return false;
 
-      //TODO: add 2fa check
+      // 2fa check
       if (existingUser.isTwoFactorEnabled) {
         const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
           existingUser.id
@@ -84,6 +86,7 @@ export const {
       const user = await getUserById(token.sub);
       if (!user) return token;
       token.role = user.role;
+      token.isTwoFactorEnabled = user.isTwoFactorEnabled;
 
       return token;
     },
@@ -93,6 +96,9 @@ export const {
       }
       if (token.role && session.user) {
         session.user.role = token.role;
+      }
+      if (token.isTwoFactorEnabled && session.user) {
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
       }
       return session;
     },
