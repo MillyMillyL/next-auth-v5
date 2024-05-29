@@ -7,6 +7,7 @@ import authConfig from "./auth.config";
 import { JWT } from "next-auth/jwt";
 import { UserRole } from "@prisma/client";
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
+import { getAccountByUserId } from "./data/account";
 
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
@@ -21,6 +22,7 @@ export type ExtendedUser = {
   // id: string;
   role: UserRole;
   isTwoFactorEnabled: boolean;
+  isOAuth: boolean;
   /**
    * By default, TypeScript merges new interface properties and overwrites existing ones.
    * In this case, the default session user properties will be overwritten,
@@ -43,6 +45,7 @@ export const {
   signIn,
   signOut,
   auth,
+  unstable_update,
 } = NextAuth({
   pages: { signIn: "/auth/login", error: "/auth/error" },
   events: {
@@ -85,6 +88,12 @@ export const {
 
       const user = await getUserById(token.sub);
       if (!user) return token;
+
+      const existingAccount = await getAccountByUserId(user.id);
+
+      token.isOAuth = !!existingAccount;
+      token.name = user.name;
+      token.email = user.email;
       token.role = user.role;
       token.isTwoFactorEnabled = user.isTwoFactorEnabled;
 
@@ -99,6 +108,12 @@ export const {
       }
       if (token.isTwoFactorEnabled && session.user) {
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+      }
+
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.email = token.email as string;
+        session.user.isOAuth = token.isOAuth as boolean;
       }
       return session;
     },

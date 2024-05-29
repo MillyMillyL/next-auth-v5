@@ -19,7 +19,7 @@ export default function Home() {
         </h1>
         <p className="text-white text-xl">A simple authentication service</p>
         <div>
-          <LoginButton>
+          <LoginButton mode="modal" asChild>
             <Button size="lg" variant="secondary">
               Sign In
             </Button>

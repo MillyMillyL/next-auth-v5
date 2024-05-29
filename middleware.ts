@@ -16,18 +16,28 @@ export default auth((req) => {
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-  if (isAPIAuthRoute) return null;
+  if (isAPIAuthRoute) return;
 
   if (isAuthRoute) {
     if (isLoggedIn)
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
-    return null;
+    return;
   }
 
-  if (!isLoggedIn && !isPublicRoute)
-    return Response.redirect(new URL("/auth/login", nextUrl));
+  if (!isLoggedIn && !isPublicRoute) {
+    let callbackUrl = nextUrl.pathname;
+    if (nextUrl.search) callbackUrl += nextUrl.search;
+    console.log("callbackUrl: ", callbackUrl);
 
-  return null;
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
+    console.log(encodedCallbackUrl);
+
+    return Response.redirect(
+      new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl)
+    );
+  }
+
+  return;
 });
 
 export const config = {
