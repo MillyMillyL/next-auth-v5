@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { SignupSchema } from "../schemas/index";
 import { getUserByEmail } from "@/data/user";
 import { generateVerificationToken } from "@/lib/tokens";
-import sendVerificationEmail from "@/lib/mail";
+import { sendVerificationEmail } from "@/lib/mail";
 
 // interface LoginResponse {
 //   success: boolean;
