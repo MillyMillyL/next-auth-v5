@@ -1,7 +1,7 @@
 ## Introduction
-```
+
 A practice project demonstrating the implementation of authentication and user management using NextAuth.js.
-```
+
 
 ## Technologies Used
 ```
