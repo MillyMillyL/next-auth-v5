@@ -12,6 +12,7 @@ PostgreSQL Database
 Resend
 Tailwind CSS
 Shadcn
+Typescript
 Deployed with Vercel
 ```
 
