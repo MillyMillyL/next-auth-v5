@@ -1,14 +1,13 @@
 ## Introduction
 
 ## Technologies Used
-···
+```
 Next JS
 Next Auth
 Prisma
 PostgreSQL Database
 Resend
-
-···
+```
 
 ## Key features
 
