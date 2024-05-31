@@ -7,6 +7,8 @@ Next Auth
 Prisma
 PostgreSQL Database
 Resend
+Tailwind CSS
+Shadcn
 ```
 
 ## Key features
