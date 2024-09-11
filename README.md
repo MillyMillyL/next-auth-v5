@@ -19,13 +19,13 @@ Deployed with Vercel
 ## Key features
 
 **NextJS NextAuth**
-
+```
 Next-auth v5 (Auth.js)
 Next.js 14 with server actions
 Next.js middleware
 Extending & Exploring next-auth session
 Next-auth callbacks
-
+```
 
 **Next-auth Providers:**
 ```
