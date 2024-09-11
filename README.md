@@ -4,15 +4,15 @@ A practice project demonstrating the implementation of authentication and user m
 
 
 ## Technologies Used
--Next JS
--Next Auth
--Prisma
--PostgreSQL Database
--Resend
--Tailwind CSS
--Shadcn
--Typescript
--Deployed with Vercel
+- Next JS
+- Next Auth
+- Prisma
+- PostgreSQL Database
+- Resend
+- Tailwind CSS
+- Shadcn
+- Typescript
+- Deployed with Vercel
 
 
 ## Key features
